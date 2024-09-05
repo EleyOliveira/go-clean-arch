@@ -9,7 +9,9 @@ package main
 import (
 	"database/sql"
 	"github.com/EleyOliveira/go-clean-arch/internal/entity"
+	"github.com/EleyOliveira/go-clean-arch/internal/infra/database"
 	"github.com/EleyOliveira/go-clean-arch/internal/usecase"
+	"github.com/google/wire"
 )
 
 import (
@@ -19,7 +21,11 @@ import (
 // Injectors from wire.go:
 
 func NewListOrderUseCase(db *sql.DB) *usecase.ListOrderUseCase {
-	orderRepository := entity.NewOrderRepository(db)
+	orderRepository := database.NewOrderRepository(db)
 	listOrderUseCase := usecase.NewListOrderUseCase(orderRepository)
 	return listOrderUseCase
 }
+
+// wire.go:
+
+var setRepositoryDependency = wire.NewSet(database.NewOrderRepository, wire.Bind(new(entity.OrderRepositoryInterface), new(*database.OrderRepository)))
