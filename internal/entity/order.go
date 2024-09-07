@@ -1,13 +1,8 @@
 package entity
 
-type Order struct {
-	ID         string
-	Price      float64
-	Tax        float64
-	Finalprice float64
-}
+import "errors"
 
-/*func NewOrder(id string, price float64, tax float64) (*Order, error) {
+func NewOrder(id string, price float64, tax float64) (*Order, error) {
 	order := &Order{
 		ID:    id,
 		Price: price,
@@ -45,4 +40,4 @@ func (o *Order) CalculateFinalPrice() error {
 	}
 	o.Finalprice = o.Price + o.Tax
 	return nil
-}*/
+}

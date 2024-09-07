@@ -10,13 +10,28 @@ type OrderOutputDTO struct {
 }
 
 type ListOrderUseCase struct {
-	orderRepository *entity.OrderRepository
+	orderRepository entity.OrderRepositoryInterface
 }
 
-func NewListOrderUseCase(repository *entity.OrderRepository) *ListOrderUseCase {
+func NewListOrderUseCase(repository entity.OrderRepositoryInterface) *ListOrderUseCase {
 	return &ListOrderUseCase{orderRepository: repository}
 }
 
-func (l *ListOrderUseCase) ListOrders() ([]entity.Order, error) {
-	return l.orderRepository.ListOrders()
+func (l *ListOrderUseCase) ListOrders() ([]OrderOutputDTO, error) {
+	orders, err := l.orderRepository.ListOrders()
+	if err != nil {
+		return []OrderOutputDTO{}, err
+	}
+
+	ordersDTO := []OrderOutputDTO{}
+
+	for _, order := range orders {
+		ordersDTO = append(ordersDTO,
+			OrderOutputDTO{ID: order.ID,
+				Price:      order.Price,
+				Tax:        order.Tax,
+				Finalprice: order.Finalprice})
+	}
+
+	return ordersDTO, nil
 }
