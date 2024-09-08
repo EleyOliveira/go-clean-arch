@@ -16,5 +16,5 @@ message OrderList {
 }
 
 service OrderService {
-    rpc ListOrder(blank) returns (OrderResponse);
+    rpc ListOrder(blank) returns (OrderList) {};
 }

@@ -3,22 +3,63 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"net"
+	"net/http"
 
+	graphql_handler "github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/EleyOliveira/go-clean-arch/configs"
+	"github.com/EleyOliveira/go-clean-arch/internal/infra/graphql/graph"
+	"github.com/EleyOliveira/go-clean-arch/internal/infra/grpc/pb"
+	"github.com/EleyOliveira/go-clean-arch/internal/infra/grpc/service"
+	"github.com/EleyOliveira/go-clean-arch/internal/infra/web/webserver"
 	_ "github.com/go-sql-driver/mysql"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {
 	//ctx := context.Background()
 
-	dbConn, err := sql.Open("mysql", "root:root@tcp(localhost:3306)/orders")
+	configs, err := configs.LoadConfig(".")
+	if err != nil {
+		panic(err)
+	}
+
+	dbConn, err := sql.Open(configs.DBDriver, fmt.Sprintf("%s:%stcp(%s:%s)/%s", configs.DBUser, configs.DBPassword,
+		configs.DBHost, configs.DBPort, configs.DBName))
 	if err != nil {
 		panic(err)
 	}
 	defer dbConn.Close()
 
-	usecase := NewListOrderUseCase(dbConn)
+	listOrderUseCase := NewListOrderUseCase(dbConn)
 
-	orders, err := usecase.ListOrders()
+	webserver := webserver.NewWebServer(configs.WebServerPort)
+	fmt.Println("web server inicializado na porta", configs.WebServerPort)
+	go webserver.Start()
+
+	grpcServer := grpc.NewServer()
+	listOrderService := service.NewOrderService(*listOrderUseCase)
+	pb.RegisterOrderServiceServer(grpcServer, listOrderService)
+	reflection.Register(grpcServer)
+	fmt.Println("Servidor gRPC inicializado na porta ", configs.GRPCServerPort)
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", configs.GRPCServerPort))
+	if err != nil {
+		panic(err)
+	}
+	go grpcServer.Serve(lis)
+
+	srv := graphql_handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
+		ListOrderUseCase: *listOrderUseCase,
+	}}))
+
+	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	http.Handle("/query", srv)
+	fmt.Println("Inicializado servidor GraphQL na porta ", configs.GraphQLServerPort)
+	http.ListenAndServe(":"+configs.GraphQLServerPort, nil)
+
+	/*orders, err := usecase.ListOrders()
 	if err != nil {
 		panic(err)
 	}
@@ -27,7 +68,7 @@ func main() {
 		fmt.Println(order.ID, order.Price, order.Tax, order.Finalprice)
 	}
 
-	/*queries := db.New(dbConn)
+	queries := db.New(dbConn)
 
 	err = queries.CreateOrder(ctx, db.CreateOrderParams{
 		ID:         uuid.New().String(),

@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v3.12.4
-// source: internal/infra/grpc/protofiles/order.proto
+// source: protofiles/order.proto
 
 package pb
 
@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OrderServiceClient interface {
-	ListOrder(ctx context.Context, in *Blank, opts ...grpc.CallOption) (*OrderResponse, error)
+	ListOrder(ctx context.Context, in *Blank, opts ...grpc.CallOption) (*OrderList, error)
 }
 
 type orderServiceClient struct {
@@ -37,9 +37,9 @@ func NewOrderServiceClient(cc grpc.ClientConnInterface) OrderServiceClient {
 	return &orderServiceClient{cc}
 }
 
-func (c *orderServiceClient) ListOrder(ctx context.Context, in *Blank, opts ...grpc.CallOption) (*OrderResponse, error) {
+func (c *orderServiceClient) ListOrder(ctx context.Context, in *Blank, opts ...grpc.CallOption) (*OrderList, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(OrderResponse)
+	out := new(OrderList)
 	err := c.cc.Invoke(ctx, OrderService_ListOrder_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (c *orderServiceClient) ListOrder(ctx context.Context, in *Blank, opts ...g
 // All implementations must embed UnimplementedOrderServiceServer
 // for forward compatibility.
 type OrderServiceServer interface {
-	ListOrder(context.Context, *Blank) (*OrderResponse, error)
+	ListOrder(context.Context, *Blank) (*OrderList, error)
 	mustEmbedUnimplementedOrderServiceServer()
 }
 
@@ -62,7 +62,7 @@ type OrderServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedOrderServiceServer struct{}
 
-func (UnimplementedOrderServiceServer) ListOrder(context.Context, *Blank) (*OrderResponse, error) {
+func (UnimplementedOrderServiceServer) ListOrder(context.Context, *Blank) (*OrderList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListOrder not implemented")
 }
 func (UnimplementedOrderServiceServer) mustEmbedUnimplementedOrderServiceServer() {}
@@ -117,5 +117,5 @@ var OrderService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "internal/infra/grpc/protofiles/order.proto",
+	Metadata: "protofiles/order.proto",
 }
