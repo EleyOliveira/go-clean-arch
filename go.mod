@@ -8,6 +8,7 @@ require (
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/google/wire v0.6.0
 	github.com/spf13/viper v1.19.0
+	github.com/streadway/amqp v1.1.0
 	github.com/vektah/gqlparser/v2 v2.5.16
 	google.golang.org/grpc v1.66.0
 	google.golang.org/protobuf v1.34.2
