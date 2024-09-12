@@ -26,7 +26,7 @@ func main() {
 		panic(err)
 	}
 
-	dbConn, err := sql.Open(configs.DBDriver, fmt.Sprintf("%s:%stcp(%s:%s)/%s", configs.DBUser, configs.DBPassword,
+	dbConn, err := sql.Open(configs.DBDriver, fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", configs.DBUser, configs.DBPassword,
 		configs.DBHost, configs.DBPort, configs.DBName))
 	if err != nil {
 		panic(err)
@@ -36,6 +36,8 @@ func main() {
 	listOrderUseCase := NewListOrderUseCase(dbConn)
 
 	webserver := webserver.NewWebServer(configs.WebServerPort)
+	webOrderHandler := NewWebOrderHandler(dbConn)
+	webserver.AddHandler("/list", webOrderHandler.List)
 	fmt.Println("web server inicializado na porta", configs.WebServerPort)
 	go webserver.Start()
 

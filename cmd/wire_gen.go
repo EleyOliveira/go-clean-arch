@@ -10,6 +10,7 @@ import (
 	"database/sql"
 	"github.com/EleyOliveira/go-clean-arch/internal/entity"
 	"github.com/EleyOliveira/go-clean-arch/internal/infra/database"
+	"github.com/EleyOliveira/go-clean-arch/internal/infra/web"
 	"github.com/EleyOliveira/go-clean-arch/internal/usecase"
 	"github.com/google/wire"
 )
@@ -26,6 +27,12 @@ func NewListOrderUseCase(db *sql.DB) *usecase.ListOrderUseCase {
 	return listOrderUseCase
 }
 
+func NewWebOrderHandler(db *sql.DB) *web.WebOrderHandler {
+	orderRepository := database.NewOrderRepository(db)
+	webOrderHandler := web.NewWebOrderHandler(orderRepository)
+	return webOrderHandler
+}
+
 // wire.go:
 
-var setRepositoryDependency = wire.NewSet(database.NewOrderRepository, wire.Bind(new(entity.OrderRepositoryInterface), new(*database.OrderRepository)))
+var setOrderRepositoryDependency = wire.NewSet(database.NewOrderRepository, wire.Bind(new(entity.OrderRepositoryInterface), new(*database.OrderRepository)))

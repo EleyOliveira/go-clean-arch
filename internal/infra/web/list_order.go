@@ -19,12 +19,13 @@ func NewWebOrderHandler(OrderRepository entity.OrderRepositoryInterface) *WebOrd
 }
 
 func (h *WebOrderHandler) List(w http.ResponseWriter, r *http.Request) {
-	var dto usecase.OrderOutputDTO
+	/*var dto usecase.OrderOutputDTO
 	err := json.NewDecoder(r.Body).Decode(&dto)
 	if err != nil {
+		println("teste")
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
-	}
+	}*/
 
 	listorder := usecase.NewListOrderUseCase(h.OrderRepository)
 	output, err := listorder.ListOrders()
