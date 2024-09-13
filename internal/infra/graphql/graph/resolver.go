@@ -7,5 +7,6 @@ import "github.com/EleyOliveira/go-clean-arch/internal/usecase"
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	ListOrderUseCase usecase.ListOrderUseCase
+	ListOrderUseCase   usecase.ListOrderUseCase
+	CreateOrderUseCase usecase.CreateOrderUseCase
 }

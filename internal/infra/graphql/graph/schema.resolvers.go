@@ -6,9 +6,15 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/EleyOliveira/go-clean-arch/internal/infra/graphql/graph/model"
 )
+
+// CreateOrder is the resolver for the createOrder field.
+func (r *mutationResolver) CreateOrder(ctx context.Context, input *model.OrderInput) (*model.Order, error) {
+	panic(fmt.Errorf("not implemented: CreateOrder - createOrder"))
+}
 
 // Orders is the resolver for the Orders field.
 func (r *queryResolver) Orders(ctx context.Context) ([]*model.Order, error) {
@@ -31,7 +37,11 @@ func (r *queryResolver) Orders(ctx context.Context) ([]*model.Order, error) {
 	return ordersOutput, nil
 }
 
+// Mutation returns MutationResolver implementation.
+func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
+
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
