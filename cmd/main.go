@@ -54,10 +54,8 @@ func main() {
 	go webserver.Start()
 
 	grpcServer := grpc.NewServer()
-	listOrderService := service.NewOrderService(*listOrderUseCase)
-	createOrderService := service.NewOrderService(*createOrderUseCase)
-	pb.RegisterOrderServiceServer(grpcServer, listOrderService)
-	pb.RegisterOrderServiceServer(grpcServer, createOrderService)
+	orderService := service.NewOrderService(*createOrderUseCase, *listOrderUseCase)
+	pb.RegisterOrderServiceServer(grpcServer, orderService)
 	reflection.Register(grpcServer)
 	fmt.Println("Servidor gRPC inicializado na porta ", configs.GRPCServerPort)
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", configs.GRPCServerPort))
