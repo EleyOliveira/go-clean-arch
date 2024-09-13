@@ -2,7 +2,7 @@ package usecase
 
 import "github.com/EleyOliveira/go-clean-arch/internal/entity"
 
-type OrderOutputDTO struct {
+type OrderListOutputDTO struct {
 	ID         string  `json:"id"`
 	Price      float64 `json:"price"`
 	Tax        float64 `json:"tax"`
@@ -17,17 +17,17 @@ func NewListOrderUseCase(repository entity.OrderRepositoryInterface) *ListOrderU
 	return &ListOrderUseCase{orderRepository: repository}
 }
 
-func (l *ListOrderUseCase) ListOrders() ([]OrderOutputDTO, error) {
+func (l *ListOrderUseCase) ListOrders() ([]OrderListOutputDTO, error) {
 	orders, err := l.orderRepository.ListOrders()
 	if err != nil {
-		return []OrderOutputDTO{}, err
+		return []OrderListOutputDTO{}, err
 	}
 
-	ordersDTO := []OrderOutputDTO{}
+	ordersDTO := []OrderListOutputDTO{}
 
 	for _, order := range orders {
 		ordersDTO = append(ordersDTO,
-			OrderOutputDTO{ID: order.ID,
+			OrderListOutputDTO{ID: order.ID,
 				Price:      order.Price,
 				Tax:        order.Tax,
 				Finalprice: order.Finalprice})
