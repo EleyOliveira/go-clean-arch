@@ -9,9 +9,11 @@ package main
 import (
 	"database/sql"
 	"github.com/EleyOliveira/go-clean-arch/internal/entity"
+	"github.com/EleyOliveira/go-clean-arch/internal/event"
 	"github.com/EleyOliveira/go-clean-arch/internal/infra/database"
 	"github.com/EleyOliveira/go-clean-arch/internal/infra/web"
 	"github.com/EleyOliveira/go-clean-arch/internal/usecase"
+	"github.com/EleyOliveira/go-clean-arch/pkg/events"
 	"github.com/google/wire"
 )
 
@@ -21,18 +23,30 @@ import (
 
 // Injectors from wire.go:
 
+func NewCreateOrderUseCase(db *sql.DB, eventDispatcher events.EventDispatcherInterface) *usecase.CreateOrderUseCase {
+	orderRepository := database.NewOrderRepository(db)
+	orderCreated := event.NewOrderCreated()
+	createOrderUseCase := usecase.NewCreateOrderUseCase(orderRepository, orderCreated, eventDispatcher)
+	return createOrderUseCase
+}
+
 func NewListOrderUseCase(db *sql.DB) *usecase.ListOrderUseCase {
 	orderRepository := database.NewOrderRepository(db)
 	listOrderUseCase := usecase.NewListOrderUseCase(orderRepository)
 	return listOrderUseCase
 }
 
-func NewWebOrderHandler(db *sql.DB) *web.WebOrderHandler {
+func NewWebOrderHandler(db *sql.DB, eventDispatcher events.EventDispatcherInterface) *web.WebOrderHandler {
 	orderRepository := database.NewOrderRepository(db)
-	webOrderHandler := web.NewWebOrderHandler(orderRepository)
+	orderCreated := event.NewOrderCreated()
+	webOrderHandler := web.NewWebOrderHandler(eventDispatcher, orderRepository, orderCreated)
 	return webOrderHandler
 }
 
 // wire.go:
 
 var setOrderRepositoryDependency = wire.NewSet(database.NewOrderRepository, wire.Bind(new(entity.OrderRepositoryInterface), new(*database.OrderRepository)))
+
+var setEventDispatcherDependency = wire.NewSet(events.NewEventDispatcher, event.NewOrderCreated, wire.Bind(new(events.EventInterface), new(*event.OrderCreated)), wire.Bind(new(events.EventDispatcherInterface), new(*events.EventDispatcher)))
+
+var setOrderCreatedEvent = wire.NewSet(event.NewOrderCreated, wire.Bind(new(events.EventInterface), new(*event.OrderCreated)))

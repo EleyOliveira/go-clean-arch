@@ -51,7 +51,7 @@ func (c *CreateOrderUseCase) Execute(input OrderInputDTO) (OrderCreateOutputDTO,
 		ID:         order.ID,
 		Price:      order.Price,
 		Tax:        order.Tax,
-		FinalPrice: order.Price + order.Tax,
+		FinalPrice: order.Finalprice,
 	}
 
 	c.OrderCreated.SetPayload(dto)
