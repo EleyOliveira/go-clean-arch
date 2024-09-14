@@ -25,7 +25,6 @@ func (s *Webserver) AddHandler(path string, handler http.HandlerFunc) {
 }
 
 func (s *Webserver) Start() {
-	//s.Router.Use((middleware.Logger))
 	for path, handler := range s.Handlers {
 		s.Router.Get(path, handler)
 		s.Router.Post(path, handler)

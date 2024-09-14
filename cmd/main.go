@@ -51,8 +51,6 @@ func main() {
 
 	webserver := webserver.NewWebServer(configs.WebServerPort)
 	webOrderHandler := NewWebOrderHandler(dbConn, eventDispatcher)
-	//webserver.AddHandler("/order", webOrderHandler.List)
-	//webserver.AddHandler("/order", webOrderHandler.Create)
 	webserver.Router.Route("/order", func(r chi.Router) {
 		r.Use(middleware.Logger)
 		r.Post("/", webOrderHandler.Create)
@@ -84,7 +82,15 @@ func main() {
 }
 
 func getRabbitMQChannel() *amqp.Channel {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+
+	configs, err := configs.LoadConfig(".")
+	if err != nil {
+		panic(err)
+	}
+
+	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s/", configs.RABBITMQ_USER, configs.RABBITMQ_PASSWORD,
+		configs.RABBITMQ_HOST, configs.RABBITMQ_SERVER_PORT))
+
 	if err != nil {
 		panic(err)
 	}
