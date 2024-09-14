@@ -29,7 +29,7 @@ func (o *OrderRepository) ListOrders() ([]entity.Order, error) {
 }
 
 func (r *OrderRepository) Save(order *entity.Order) error {
-	stmt, err := r.Db.Prepare("INSERT INTO orders (id, price, tax, final_price) VALUES (?, ?, ?, ?)")
+	stmt, err := r.Db.Prepare("INSERT INTO orders (id, price, tax, finalprice) VALUES (?, ?, ?, ?)")
 	if err != nil {
 		return err
 	}
