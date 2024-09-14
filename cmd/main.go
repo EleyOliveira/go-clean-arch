@@ -15,6 +15,9 @@ import (
 	"github.com/EleyOliveira/go-clean-arch/internal/infra/grpc/service"
 	"github.com/EleyOliveira/go-clean-arch/internal/infra/web/webserver"
 	"github.com/EleyOliveira/go-clean-arch/pkg/events"
+
+	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/streadway/amqp"
 	"google.golang.org/grpc"
@@ -48,8 +51,13 @@ func main() {
 
 	webserver := webserver.NewWebServer(configs.WebServerPort)
 	webOrderHandler := NewWebOrderHandler(dbConn, eventDispatcher)
-	webserver.AddHandler("/list", webOrderHandler.List)
-	webserver.AddHandler("/order", webOrderHandler.Create)
+	//webserver.AddHandler("/order", webOrderHandler.List)
+	//webserver.AddHandler("/order", webOrderHandler.Create)
+	webserver.Router.Route("/order", func(r chi.Router) {
+		r.Use(middleware.Logger)
+		r.Post("/", webOrderHandler.Create)
+		r.Get("/", webOrderHandler.List)
+	})
 	fmt.Println("web server inicializado na porta", configs.WebServerPort)
 	go webserver.Start()
 

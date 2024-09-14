@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 )
 
 type Webserver struct {
@@ -26,10 +25,10 @@ func (s *Webserver) AddHandler(path string, handler http.HandlerFunc) {
 }
 
 func (s *Webserver) Start() {
-	s.Router.Use((middleware.Logger))
+	//s.Router.Use((middleware.Logger))
 	for path, handler := range s.Handlers {
-		s.Router.Handle(path, handler)
-
+		s.Router.Get(path, handler)
+		s.Router.Post(path, handler)
 	}
 
 	http.ListenAndServe(s.WebServerPort, s.Router)
