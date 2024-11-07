@@ -25,7 +25,6 @@ import (
 )
 
 func main() {
-	//ctx := context.Background()
 
 	configs, err := configs.LoadConfig(".")
 	if err != nil {
